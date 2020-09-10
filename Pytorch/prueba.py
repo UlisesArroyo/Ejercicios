@@ -1,6 +1,6 @@
 import torch
 import torchvision
-
+import matplotlib.pyplot as plt
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
@@ -34,7 +34,7 @@ test_loader = torch.utils.data.DataLoader(
                              ])),
   batch_size=batch_size_test, shuffle=True)
 
-examples = enumerate(test_loader)
+examples = enumerate(test_loader) 
 batch_idx, (example_data, example_targets) = next(examples)
 
 example_data.shape
@@ -67,11 +67,16 @@ class Net(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x)
 
+network = Net()
+optimizer = optim.SGD(network.parameters(), lr=learning_rate,
+                      momentum=momentum)
 
 train_losses = []
 train_counter = []
 test_losses = []
 test_counter = [i*len(train_loader.dataset) for i in range(n_epochs + 1)]
+
+
 
 def train(epoch):
   network.train()
@@ -109,11 +114,11 @@ def test():
     test_loss, correct, len(test_loader.dataset),
     100. * correct / len(test_loader.dataset)))
 
-
-
-
 test()
 for epoch in range(1, n_epochs + 1):
   train(epoch)
   test()
+
+
+
 
