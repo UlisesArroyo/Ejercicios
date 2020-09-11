@@ -44,9 +44,9 @@ class RED(nn.Sequential):
         self.linear3 = nn.Linear(64,10)
     
     def forward(self,X):
-        X = torch.sigmoid(self.linear1(X))
+        X = torch.sigmoid(self.linear1(X))      #Primera capa (Sigmoid) 784 -> 64
         #X = F.relu(self.linear2(X))
-        X = self.linear3(X)
+        X = self.linear3(X)                     #Segunda capa 
         return F.log_softmax(X, dim=1)
  
 modelo= RED() #Objeto 
@@ -65,12 +65,14 @@ loss.backward()
 print('After backward pass: \n', modelo[0].weight.grad)
 
 
-optimizer = optim.SGD(modelo.parameters(), lr=0.1)
-time1 = time()
-epochs = 20
+optimizer = optim.Adam(modelo.parameters(), lr=0.01)
+time1 = time()                                      #Captura de tiempo del entrenamiento
+epochs = 20                                         #Numero de epocas
+
 for e in range(epochs):
     running_loss = 0 								#Establece en 0 la perdida total de esta epoca
-    time0 = time()
+    time0 = time()                                  #Empieza la captura de tiempo para cada epoca
+
     for images, labels in trainloader:
         # Flatten MNIST images into a 784 long vector
         images = images.view(images.shape[0], -1) 	#view sirve para cambiar el tamaño del tensor (images.shape[0] = 64 x -1)
@@ -88,9 +90,9 @@ for e in range(epochs):
         # Training pass
         optimizer.zero_grad()						#Pone en 0 todos los gradiantes, al parecer se necesita hacer antes de la retropropagacion 
         
-        output = modelo(images)						#Se introduce la informacion de un batch a la red neuronal y nos regresa el 
-        print("output: ",output)
-        print("labels: ",labels)
+        output = modelo(images)						#Se introduce la informacion de un batch a la red neuronal y nos regresa el val
+        #print("output: ",output)
+        #print("labels: ",labels)
         loss = criterion(output, labels)
         
         #This is where the model learns by backpropagating
