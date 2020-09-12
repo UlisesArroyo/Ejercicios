@@ -40,12 +40,12 @@ class RED(nn.Sequential):
     def __init__(self):
         super(RED, self).__init__()
         self.linear1 = nn.Linear(784,64)
-        #self.linear2 = nn.Linear(250,100)
+        self.linear2 = nn.Linear(64,64)
         self.linear3 = nn.Linear(64,10)
     
     def forward(self,X):
-        X = torch.sigmoid(self.linear1(X))      #Primera capa (Sigmoid) 784 -> 64
-        #X = F.relu(self.linear2(X))
+        X = torch.relu(self.linear1(X))      #Primera capa (Sigmoid) 784 -> 64
+        X = torch.relu(self.linear2(X))
         X = self.linear3(X)                     #Segunda capa 
         return F.log_softmax(X, dim=1)
  
@@ -54,21 +54,15 @@ print(modelo)
 #definimos el optimizador
 
 
-def to_categorical(y, num_classes):             #Transforma tensor a "tensor categorico" (one-hot format)
-    """ 1-hot encodes a tensor """
-    return torch.from_numpy(np.eye(num_classes, dtype='float32')[y])
-
 
 criterion = nn.NLLLoss()
 #criterion = nn.MSELoss()
 images, labels = next(iter(trainloader))
 images = images.view(images.shape[0], -1) #Aplana las imagenes a 64 * 784
-#labels = to_categorical(labels,10)
 logps = modelo(images) #log probabilities
 
 
 loss = criterion(logps, labels) #calculate the NLL loss
-print("Loss: ",loss)
 print('Before backward pass: \n', modelo[0].weight.grad)
 
 
@@ -77,7 +71,7 @@ loss.backward()
 print('After backward pass: \n', modelo[0].weight.grad)
 
 
-optimizer = optim.SGD(modelo.parameters(), lr=0.01)
+optimizer = optim.SGD(modelo.parameters(), lr=0.1)
 time1 = time()                                      #Captura de tiempo del entrenamiento
 epochs = 20                                         #Numero de epocas
 
@@ -87,9 +81,8 @@ for e in range(epochs):
     total = 0
     correct = 0
     for data in trainloader:
+        images,labels = data
         # Flatten MNIST images into a 784 long vector
-        images, labels = data
-
         images = images.view(images.shape[0], -1) 	#view sirve para cambiar el tamaño del tensor (images.shape[0] = 64 x -1)
         											#Al inicio el tensor es de [64, 1, 28, 28] [imagenes,escala de grises,ancho,alto] (64 x 1 x 28 x 28 = 50176)
         											#Se cambiara el tamaño del tensor a uno de 64 x -1 (el -1 le dice a la computadora que ella acomplete el dato)
@@ -106,14 +99,8 @@ for e in range(epochs):
         optimizer.zero_grad()						#Pone en 0 todos los gradiantes, al parecer se necesita hacer antes de la retropropagacion 
         
         output = modelo(images)						#Se introduce la informacion de un batch a la red neuronal y nos regresa el val
-        #print("output: ",output)
-        #print("labels: ",labels)
-        #labels = to_categorical(labels,10)
         loss = criterion(output, labels)
-
-        #print("loss:",loss)
         #print("loss: ",loss)
-
         #This is where the model learns by backpropagating
         loss.backward()
         
@@ -121,11 +108,9 @@ for e in range(epochs):
         optimizer.step()
         
         running_loss += loss.item()					#va sumando los errores de cada lote (0-1). Lo esperado es que esto sea 0
-
         _, predicted = torch.max(output.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
-
     else:
         running_loss_2 = 0
         total_2=0
@@ -142,13 +127,15 @@ for e in range(epochs):
             correct_2 += (predicted_2 == labels_2).sum().item()
 
 
-        
+
         print("Epoch {}".format(e),end="")
         print("||Training loss: {:.4f}\t|".format(running_loss/len(trainloader)),end="")
-        print("| Training Accuracy  {:.4f}||\t".format(100*correct/total),end="")
+        print("|Training Accuracy  % {:.4f}||\t".format(100*correct/total),end="")
         print("||val loss: {:.4f}\t|".format(running_loss_2/len(valloader)),end="")
-        print("|val accuary  {:.4f}\t||".format(100*correct_2/total_2),end="")
+        print("|val accuary  % {:.4f}\t||".format(100*correct_2/total_2),end="")
         print("time: {:.4f} seg".format(time()-time0))
+
+
 time2 = time()        
 print("\nTraining Time (in minutes) =",(time2-time1)/60)
 
