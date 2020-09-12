@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torchvision
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from time import time
 from torchvision import datasets, transforms
 from torch import nn, optim
@@ -22,16 +22,16 @@ images, labels = dataiter.next()
 print(images.shape)
 print(labels.shape)
 
-plt.imshow(images[0].numpy().squeeze(), cmap='gray_r')
+#plt.imshow(images[0].numpy().squeeze(), cmap='gray_r')
 
-
+"""
 figure = plt.figure()
 num_of_images = 60
 for index in range(1, num_of_images + 1):
     plt.subplot(6, 10, index)
     plt.axis('off')
     plt.imshow(images[index].numpy().squeeze(), cmap='gray_r')
-
+"""
 input_size = 784
 hidden_sizes = [128, 64]
 output_size = 10
@@ -89,8 +89,8 @@ def view_classify(img, ps):
     '''
     ps = ps.data.numpy().squeeze()
 
-    fig, (ax1, ax2) = plt.subplots(figsize=(6,9), ncols=2)
-    ax1.imshow(img.resize_(1, 28, 28).numpy().squeeze())
+#    fig, (ax1, ax2) = plt.subplots(figsize=(6,9), ncols=2)
+#    ax1.imshow(img.resize_(1, 28, 28).numpy().squeeze())
     ax1.axis('off')
     ax2.barh(np.arange(10), ps)
     ax2.set_aspect(0.1)

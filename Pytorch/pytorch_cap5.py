@@ -65,7 +65,7 @@ loss.backward()
 print('After backward pass: \n', modelo[0].weight.grad)
 
 
-optimizer = optim.Adam(modelo.parameters(), lr=0.01)
+optimizer = optim.SGD(modelo.parameters(), lr=0.01)
 time1 = time()                                      #Captura de tiempo del entrenamiento
 epochs = 20                                         #Numero de epocas
 
@@ -94,7 +94,7 @@ for e in range(epochs):
         #print("output: ",output)
         #print("labels: ",labels)
         loss = criterion(output, labels)
-        
+        #print("loss:",loss)
         #This is where the model learns by backpropagating
         loss.backward()
         
