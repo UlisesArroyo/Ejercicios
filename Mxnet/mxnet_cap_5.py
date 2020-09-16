@@ -52,13 +52,13 @@ mlp_model.fit(train_iter,  # train data // Info de entrenamiento
               optimizer_params={'learning_rate':0.01},  # use fixed learning rate // La taza de aprendizaje 
               eval_metric='acc',  # report accuracy during training // reporte de exactitud durante el entrenamiento
               batch_end_callback = mx.callback.Speedometer(batch_size, 100), # output progress for each 100 data batches // progreso por cada 100 lotes
-              num_epoch=10)  # train for at most 10 dataset passes // cantidad de epocas 
+              num_epoch=200)  # train for at most 10 dataset passes // cantidad de epocas 
 
 
 #Realiza una prediccion a la probabilidad que tendra la red neuronal en determinar el numero de la imagen correctamente
 test_iter = mx.io.NDArrayIter(mnist['test_data'], None, batch_size) 
 prob = mlp_model.predict(test_iter)
-assert prob.shape == (10000, 10)
+assert prob.shape == (10000, 200)
 
 #Se calcula la precision que tuvo la red neuronal 
 test_iter = mx.io.NDArrayIter(mnist['test_data'], mnist['test_label'], batch_size)
