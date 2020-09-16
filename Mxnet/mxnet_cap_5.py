@@ -27,7 +27,7 @@ data = mx.sym.flatten(data=data) #Aplana nuestras imagenes de 28 * 28 a 784
 #------------------------CONSTRUCCION DE RED NEURONAL-------------------------------
 
 # The first fully-connected layer and the corresponding activation function
-fc1  = mx.sym.FullyConnected(data=data, num_hidden=128) #Se crea la capa densa y se especifica el numero de neuronas que tendra. Tambien especifica que informacion se le introducira
+fc1  = mx.sym.FullyConnected(data=data, num_hidden=64) #Se crea la capa densa y se especifica el numero de neuronas que tendra. Tambien especifica que informacion se le introducira
 act1 = mx.sym.Activation(data=fc1, act_type="sigmoid")		#Se especifica el tipo de funcion de activacion que tendra la primera capa
 
 # The second fully-connected layer and the corresponding activation function
