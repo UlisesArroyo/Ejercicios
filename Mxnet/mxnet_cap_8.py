@@ -28,15 +28,15 @@ data = mx.sym.flatten(data=data) #Aplana nuestras imagenes de 28 * 28 a 784
 
 # The first fully-connected layer and the corresponding activation function
 fc1  = mx.sym.FullyConnected(data=data, num_hidden=64) #Se crea la capa densa y se especifica el numero de neuronas que tendra. Tambien especifica que informacion se le introducira
-act1 = mx.sym.Activation(data=fc1, act_type="sigmoid")		#Se especifica el tipo de funcion de activacion que tendra la primera capa
+act1 = mx.sym.Activation(data=fc1, act_type="relu")		#Se especifica el tipo de funcion de activacion que tendra la primera capa
 
 # The second fully-connected layer and the corresponding activation function
-#fc2  = mx.sym.FullyConnected(data=act1, num_hidden = 64)
-#act2 = mx.sym.Activation(data=fc2, act_type="relu")
+fc2  = mx.sym.FullyConnected(data=act1, num_hidden = 64)
+act2 = mx.sym.Activation(data=fc2, act_type="relu")
 
 
 # MNIST has 10 classes
-fc3  = mx.sym.FullyConnected(data=act1, num_hidden=10)	#Ultima capa 
+fc3  = mx.sym.FullyConnected(data=act2, num_hidden=10)	#Ultima capa 
 # Softmax with cross entropy loss
 mlp  = mx.sym.SoftmaxOutput(data=fc3, name='softmax')	#La ultima funcion se especifica, en este caso softmax
 
@@ -49,7 +49,7 @@ mlp_model = mx.mod.Module(symbol=mlp, context=mx.cpu())
 mlp_model.fit(train_iter,  # train data // Info de entrenamiento
               eval_data=val_iter,  # validation data // Info de validacion
               optimizer='sgd',  # use SGD to train // Tipo de optimizador a utilizar
-              optimizer_params={'learning_rate':0.01},  # use fixed learning rate // La taza de aprendizaje 
+              optimizer_params={'learning_rate':0.1},  # use fixed learning rate // La taza de aprendizaje 
               eval_metric='acc',  # report accuracy during training // reporte de exactitud durante el entrenamiento
               batch_end_callback = mx.callback.Speedometer(batch_size, 100), # output progress for each 100 data batches // progreso por cada 100 lotes
               num_epoch=10)  # train for at most 10 dataset passes // cantidad de epocas 
