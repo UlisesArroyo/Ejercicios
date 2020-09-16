@@ -58,7 +58,7 @@ mlp_model.fit(train_iter,  # train data // Info de entrenamiento
 #Realiza una prediccion a la probabilidad que tendra la red neuronal en determinar el numero de la imagen correctamente
 test_iter = mx.io.NDArrayIter(mnist['test_data'], None, batch_size) 
 prob = mlp_model.predict(test_iter)
-assert prob.shape == (10000, 200)
+assert prob.shape == (10000, 10)
 
 #Se calcula la precision que tuvo la red neuronal 
 test_iter = mx.io.NDArrayIter(mnist['test_data'], mnist['test_label'], batch_size)
