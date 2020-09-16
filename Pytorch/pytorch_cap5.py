@@ -110,7 +110,10 @@ for e in range(epochs):
         #print("labels: ",labels)
         #labels = to_categorical(labels,10)
         loss = criterion(output, labels)
+
+        #print("loss:",loss)
         #print("loss: ",loss)
+
         #This is where the model learns by backpropagating
         loss.backward()
         

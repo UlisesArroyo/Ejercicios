@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import SGD
 from matplotlib import pyplot as plt
-
+from time import time
 (X_train, y_train), (X_valid, y_valid) = mnist.load_data()
 
 #X_train.shape
@@ -61,10 +61,11 @@ model.summary()
 #(10*64)+10
 
 model.compile(loss='mean_squared_error', optimizer=SGD(lr=0.01), metrics=['accuracy'])
-
+time0 = time()
 model.fit(X_train, y_train, batch_size=128, epochs=200, verbose=1, validation_data=(X_valid, y_valid))
-
+time1 = time()
 model.evaluate(X_valid, y_valid)
 
+print("El programa se tardo en entrenar: {:.2f} min".format((time1 - time0)/60))
 
 

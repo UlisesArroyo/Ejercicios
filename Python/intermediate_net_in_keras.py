@@ -3,7 +3,7 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import SGD
-
+from time import time
 (X_train, y_train), (X_valid, y_valid) = mnist.load_data()
 
 X_train = X_train.reshape(60000, 784).astype('float32')
@@ -26,5 +26,8 @@ model.summary()
 
 model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['accuracy'])
 
-
+time0 = time()
 model.fit(X_train, y_train, batch_size=128, epochs=20, verbose=1, validation_data=(X_valid, y_valid))
+time1 = time()
+
+print("El programa  se tardo {:.2f} min".format((time1 - time0)/60))
