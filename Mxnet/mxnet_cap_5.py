@@ -1,7 +1,7 @@
 #version buena
 import mxnet as mx
 import logging
-
+from time import time
 
 
 #------------------------CAPTURA Y PROCESAMIENTO DE BASE DE DATOS-------------------------------
@@ -45,6 +45,7 @@ mlp  = mx.sym.SoftmaxOutput(data=fc3, name='softmax')	#La ultima funcion se espe
 
 logging.getLogger().setLevel(logging.DEBUG)  # logging to stdout
 # create a trainable module on CPU
+time1 = time()
 mlp_model = mx.mod.Module(symbol=mlp, context=mx.cpu())
 mlp_model.fit(train_iter,  # train data // Info de entrenamiento
               eval_data=val_iter,  # validation data // Info de validacion
@@ -54,7 +55,7 @@ mlp_model.fit(train_iter,  # train data // Info de entrenamiento
               batch_end_callback = mx.callback.Speedometer(batch_size, 100), # output progress for each 100 data batches // progreso por cada 100 lotes
               num_epoch=200)  # train for at most 10 dataset passes // cantidad de epocas 
 
-
+ 
 #Realiza una prediccion a la probabilidad que tendra la red neuronal en determinar el numero de la imagen correctamente
 test_iter = mx.io.NDArrayIter(mnist['test_data'], None, batch_size) 
 prob = mlp_model.predict(test_iter)
@@ -66,4 +67,5 @@ test_iter = mx.io.NDArrayIter(mnist['test_data'], mnist['test_label'], batch_siz
 acc = mx.metric.Accuracy()
 mlp_model.score(test_iter, acc)
 print(acc)
+print("Tiempo que tarda el entrenamiento: {:.4f} seg".format((time()-time1)))
 
