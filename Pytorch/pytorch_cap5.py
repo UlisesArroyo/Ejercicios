@@ -16,7 +16,7 @@ from torch.autograd import Variable
 #Transformacion de datos
 #Convierte las imagenes a tensoress y los normaliza
 transform = transforms.Compose([transforms.ToTensor(),
-                              transforms.Normalize((0.5,), (0.5,)),
+                              #transforms.Normalize((0.5,), (0.5,)),
                               ])
 
 #Descarga y guarda 
@@ -29,9 +29,10 @@ dataiter = iter(trainloader) #cada que se inicie el programa se accede a un batc
 images, labels = dataiter.next() #cada que se inicie el programa se accede a un batch diferente
 
 
-print(images.shape)#torch.Size([64, 1, 28, 28])
-print(labels.shape)#torch.Size([64])
-
+print(images.shape)#torch.Size([128, 1, 28, 28]) -----> ([128,])
+print(labels.shape)#torch.Size([128])            -----> ([])
+#
+#
 #plt.imshow(images[0].numpy().squeeze(), cmap='gray_r')
 #plt.show()
 
@@ -44,10 +45,9 @@ class RED(nn.Sequential):
         self.linear3 = nn.Linear(64,10)
     
     def forward(self,X):
-        X = torch.sigmoid(self.linear1(X))      #Primera capa (Sigmoid) 784 -> 64
-        #X = F.relu(self.linear2(X))
+        X = F.sigmoid(self.linear1(X))      #Primera capa (Sigmoid) 784 -> 64
         X = self.linear3(X)                     #Segunda capa 
-        return F.log_softmax(X, dim=1)
+        return F.softmax(X, dim=1)
  
 modelo= RED() #Objeto 
 print(modelo)
@@ -59,20 +59,27 @@ def to_categorical(y, num_classes):             #Transforma tensor a "tensor cat
     return torch.from_numpy(np.eye(num_classes, dtype='float32')[y])
 
 
-criterion = nn.NLLLoss()
-#criterion = nn.MSELoss()
+criterion_2 = nn.NLLLoss()
+criterion = nn.MSELoss()
 images, labels = next(iter(trainloader))
 images = images.view(images.shape[0], -1) #Aplana las imagenes a 64 * 784
-#labels = to_categorical(labels,10)
-logps = modelo(images) #log probabilities
 
+#labels_ = to_categorical(labels,10)
+
+labels = torch.zeros(images.size(0), 10).scatter_(1, labels[:, None], 1.)
+
+logps = modelo(images) #log probabilities
+print(images.shape)
+print(labels.shape)
 
 loss = criterion(logps, labels) #calculate the NLL loss
-print("Loss: ",loss)
+print("logps: ",torch.sum(logps))
+print("Loss: ",torch.sum(loss))
 print('Before backward pass: \n', modelo[0].weight.grad)
 
 
 loss.backward()
+#torch.set_printoptions(edgeitems=3)
 
 print('After backward pass: \n', modelo[0].weight.grad)
 
@@ -90,7 +97,7 @@ for e in range(epochs):
         # Flatten MNIST images into a 784 long vector
         images, labels = data
 
-        images = images.view(images.shape[0], -1) 	#view sirve para cambiar el tamaño del tensor (images.shape[0] = 64 x -1)
+        #images = images.view(images.shape[0], -1) 	#view sirve para cambiar el tamaño del tensor (images.shape[0] = 64 x -1)
         											#Al inicio el tensor es de [64, 1, 28, 28] [imagenes,escala de grises,ancho,alto] (64 x 1 x 28 x 28 = 50176)
         											#Se cambiara el tamaño del tensor a uno de 64 x -1 (el -1 le dice a la computadora que ella acomplete el dato)
         											#Para hacer el cambio de tamaño tiene que caber todos los datos que tenias en la nueva forma 
@@ -105,12 +112,17 @@ for e in range(epochs):
         # Training pass
         optimizer.zero_grad()						#Pone en 0 todos los gradiantes, al parecer se necesita hacer antes de la retropropagacion 
         
-        output = modelo(images)						#Se introduce la informacion de un batch a la red neuronal y nos regresa el val
+        output = modelo(images.view(images.size(0), -1))						#Se introduce la informacion de un batch a la red neuronal y nos regresa el val
         #print("output: ",output)
         #print("labels: ",labels)
-        #labels = to_categorical(labels,10)
-        loss = criterion(output, labels)
-
+        #labels_ = to_categorical(labels,10)
+        labels_ = torch.zeros(images.size(0), 10).scatter_(1, labels[:, None], 1.)
+        #print("labels_",labels_.shape) #   torch.Size([128, 10])
+        #print("output: ",output.shape) #   torch.Size([128, 10])
+        loss_2 = criterion_2(output, labels)
+        loss = criterion(output,labels_)
+        #print("loss_1: ",loss)
+        #print("loss_2: ",loss_2)
         #print("loss:",loss)
         #print("loss: ",loss)
 
@@ -124,23 +136,29 @@ for e in range(epochs):
 
         _, predicted = torch.max(output.data, 1)
         total += labels.size(0)
+        #print("predicte: ",predicted.shape)
+        #print("labels: ",labels.shape)
         correct += (predicted == labels).sum().item()
 
-    else:
+    with torch.no_grad():
         running_loss_2 = 0
         total_2=0
         correct_2=0
-        for data in valloader:
-            images_2, labels_2 = data
-            images_2 = images_2.view(images_2.shape[0], -1) 
-            output_2 = modelo(images_2)
-            loss_2 = criterion(output_2,labels_2)
+        
+        for data_2 in valloader:
+            images_2, labels_2 = data_2
+            #images_2 = images_2.view(images_2.shape[0], -1) 
+            labels2 = to_categorical(labels_2,10)
+            output_2 = modelo(images_2.view(images_2.shape[0], -1) )
+            loss_2 = criterion(output_2,labels2)
 
             running_loss_2 += loss_2.item()
             _, predicted_2 = torch.max(output_2.data, 1)
             total_2 += labels_2.size(0)
+            #print("predicte_2: ",predicted_2.shape)
+            #print("labels_2: ",labels_2.shape)
             correct_2 += (predicted_2 == labels_2).sum().item()
-
+            
 
         
         print("Epoch {}".format(e),end="")
