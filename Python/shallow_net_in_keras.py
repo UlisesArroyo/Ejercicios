@@ -5,6 +5,8 @@ from keras.layers import Dense
 from keras.optimizers import SGD
 from matplotlib import pyplot as plt
 from time import time
+
+
 (X_train, y_train), (X_valid, y_valid) = mnist.load_data()
 
 #X_train.shape

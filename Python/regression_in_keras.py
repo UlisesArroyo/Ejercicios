@@ -3,7 +3,7 @@ from keras.datasets import boston_housing
 from keras.models import Sequential
 from keras.layers import Dense, Dropout 
 from keras.layers.normalization import BatchNormalization
-
+from time import time
 
 (X_train, y_train), (X_valid, y_valid) = boston_housing.load_data()
 
@@ -28,9 +28,12 @@ model.summary()
 
 model.compile(loss='mean_squared_error', optimizer='adam')
 
-
+time1 = time()
 model.fit(X_train, y_train,batch_size=8, epochs=32, verbose=1,validation_data=(X_valid, y_valid))
 
+
+time2 = time()        
+print("\nTraining Time (in seconds) =",(time2-time1))   
 print(X_valid[42])
 
 print(y_valid[42])	

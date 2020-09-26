@@ -167,8 +167,8 @@ for e in range(epochs):
         print("||val loss: {:.4f}\t|".format(running_loss_2/len(valloader)),end="")
         print("|val accuary  {:.4f}\t||".format(100*correct_2/total_2),end="")
         print("time: {:.4f} seg".format(time()-time0))
-time2 = time()        
-print("\nTraining Time (in minutes) =",(time2-time1)/60)
+    time2 = time()        
+    print("\nTraining Time (in minutes) =",(time2-time1)/60)
 
 
 def view_classify(img, ps):

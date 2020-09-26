@@ -48,10 +48,13 @@ print("dim: ",dim)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=0)
 num_train = X_train.shape[0]
 
+X_train = torch.tensor(X_train, dtype=torch.float)
+X_test = torch.tensor(X_test, dtype=torch.float)
+y_train = torch.tensor(y_train, dtype=torch.float).view(-1, 1)
+y_test = torch.tensor(y_test, dtype=torch.float).view(-1, 1)
 
-
-train_dataset 	= TensorDataset(torch.from_numpy(X_train).clone().float(), torch.from_numpy(y_train).clone().float())
-val_dataset		= TensorDataset(torch.from_numpy(X_test).clone().float(), torch.from_numpy(y_test).clone().float())
+train_dataset 	= TensorDataset((X_train), (y_train))
+val_dataset		= TensorDataset((X_test), (y_test))
 
 train_loader 	= DataLoader(dataset=train_dataset, batch_size=8, shuffle=True)
 val_loader		= DataLoader(dataset=val_dataset, batch_size=8, shuffle=False)
@@ -67,7 +70,8 @@ for epoch in range(32):
         optimizer.zero_grad()
         #print("data: ",data.shape)
         output = model(data)
-        loss = criterion(output.view(output.size(0)), target)
+        #print("output: ", output.view(output.size(0)).shape)
+        loss = criterion(output.view(output.size(0)), target.view(target.size(0)))
         loss.backward()
         optimizer.step()
         #print("output", output[1].shape)
@@ -79,7 +83,7 @@ for epoch in range(32):
             #target = torch.zeros(data.size(0), 10).scatter_(1, target[:, None], 1.)
         
             output = model(data)
-            loss = criterion(output.view(output.size(0)), target)
+            loss = criterion(output.view(output.size(0)), target.view(target.size(0)))
 
             val_loss += loss.item()
     
@@ -90,12 +94,15 @@ for epoch in range(32):
     print("        ||tiempo: ",time()-time0,"(seg)")
 time2 = time()        
 print("\nTraining Time (in seconds) =",(time2-time1))   
+"""
+x_pre = X_train[11].view(1,X_train[11].size(0))
+print("X_train: ",x_pre.shape)
+out = model(x_pre)
+print("X_train: ",out)
+"""
+print(model(X_test[10:12]).data)
+print(y_test[10:12])
 
 
 
 #model.predict(np.reshape(X_valid[42], [1, 13]))
-
-py = model(torch.DoubleTensor(X_train))
-plt.plot(y_train, py.detach().numpy(), '+')
-plt.xlabel('Actual value of training set')
-plt.ylabel('Prediction') 
